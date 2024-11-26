@@ -8,48 +8,48 @@ async function fetchAPI(key) {
 
 export default function StatusPage() {
   return (
-    <>
+    <div>
       <h1>Status</h1>
       <UpdatedAt />
-    </>
+      <DatabaseStatus />
+    </div>
   );
 }
 
 function UpdatedAt() {
-  const { isLoading, data, error } = useSWR("/api/v1/status", fetchAPI, {
+  const { isLoading, data } = useSWR("/api/v1/status", fetchAPI, {
     refreshInterval: 2000,
   });
 
-  if (isLoading) {
-    return <div>Carregando...</div>;
+  let UpdatedAtText = "Carregando...";
+
+  if (!isLoading && data) {
+    UpdatedAtText = new Date(data.updated_at).toLocaleString("pt-BR");
   }
+  return <div>Última atualização: {UpdatedAtText}</div>;
+}
 
-  if (error) {
-    return <div>Erro ao carregar os dados</div>;
+function DatabaseStatus() {
+  const { isLoading, data } = useSWR("/api/v1/status", fetchAPI, {
+    refreshInterval: 2000,
+  });
+
+  let databaseStatusInformation = "Carregando...";
+
+  if (!isLoading && data) {
+    databaseStatusInformation = (
+      <>
+        <div>Versão: {data.dependencies.database.version}</div>
+        <div>Conexões abertas: {data.dependencies.database.opened_connections}</div>
+        <div>Conexões máximas: {data.dependencies.database.max_connections}</div>
+      </>
+    );
+
   }
-
-  if (!data || !data.dependencies || !data.dependencies.database) {
-    return <div>Dados incompletos</div>;
-  }
-
-  const UpdatedAtText = new Date(data.updated_at).toLocaleString("pt-BR");
-  const { version, max_connections, opened_connections } =
-    data.dependencies.database;
-
   return (
-    <div>
-      <div style={{ marginBottom: "10px" }}>
-        Última atualização: {UpdatedAtText}
-      </div>
-      <div style={{ marginBottom: "10px" }}>
-        Versão do banco de dados: {version}
-      </div>
-      <div style={{ marginBottom: "10px" }}>
-        Máximo de conexões: {max_connections}
-      </div>
-      <div style={{ marginBottom: "10px" }}>
-        Conexões abertas: {opened_connections}
-      </div>
-    </div>
+    <>
+      <h2>Databse</h2>
+      <div>{databaseStatusInformation}</div>
+    </>
   );
 }
