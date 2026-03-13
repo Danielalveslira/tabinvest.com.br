@@ -11,6 +11,7 @@ beforeAll(async () => {
 
 describe("Use case: Registration Flow (all sucessful)", () => {
   let createUserResponseBody;
+  let activationTokenId;
 
   test("Create user account", async () => {
     const createUserResponse = await fetch(
@@ -64,7 +65,23 @@ describe("Use case: Registration Flow (all sucessful)", () => {
     expect(activationTokenObject.used_at).toBe(null);
   });
 
-  test("Activate account", () => {});
+  test("Activate account", async () => {
+    const activationResponse = await fetch(
+      `http://localhost:3000/api/v1/activations/${activationTokenId}`,
+      {
+        method: "PATCH",
+      },
+    );
+
+    expect(activationResponse.status).toBe(200);
+
+    const activationResponseBody = await activationResponse.json();
+
+    expect(Date.parse(activationResponseBody.used_at)).not.toBeNaN();
+
+    const activatedUser = await user.findOneByUsername("dnllira");
+    expect(activatedUser.features).toEqual(["create:session"]);
+  });
 
   test("Login", () => {});
 
