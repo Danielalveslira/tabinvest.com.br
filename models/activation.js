@@ -105,6 +105,7 @@ Equipe TabInvest`,
 }
 
 const activation = {
+  activateUserByUserId,
   markTokenAsUsed,
   findOneValidById,
   create,
