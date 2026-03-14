@@ -61,23 +61,23 @@ async function create(userId) {
   }
 }
 
-async function markToKenAsUsed(activationTokenId) {
+async function markTokenAsUsed(activationTokenId) {
   const usedActivationToken = await runUpdateQuery(activationTokenId);
   return usedActivationToken;
 
-  async function runInsertQuery(activationTokenId) {
+  async function runUpdateQuery(activationTokenId) {
     const results = await database.query({
       text: `
-        UPDATE
-          user_activation_tokens
-        SET
-          used_at = timezone('utc', now()),
-          updated_at = timezone('utc', now())
-        WHERE
-          id = $1
-        RETURNING
-          *
-      ;`,
+       UPDATE
+         user_activation_tokens
+       SET
+         used_at = timezone('utc', now()),
+         updated_at = timezone('utc', now())
+       WHERE
+         id = $1
+       RETURNING
+         *
+     `,
       values: [activationTokenId],
     });
 
@@ -105,7 +105,7 @@ Equipe TabInvest`,
 }
 
 const activation = {
-  markToKenAsUsed,
+  markTokenAsUsed,
   findOneValidById,
   create,
   sendEmailToUser,

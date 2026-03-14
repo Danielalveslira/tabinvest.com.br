@@ -1,6 +1,7 @@
 import { createRouter } from "next-connect";
 import controller from "infra/controller.js";
 import activation from "models/activation.js";
+import user from "models/user.js";
 
 const router = createRouter();
 
@@ -13,10 +14,11 @@ async function patchHandler(request, response) {
 
   const validActivationToken =
     await activation.findOneValidById(activationTokenId);
-  const usedActivationToken =
-    await activation.markToKenAsUsed(activationTokenId);
 
-  await activation.activateUserByUserId(validActivationToken.user_id);
+  const usedActivationToken =
+    await activation.markTokenAsUsed(activationTokenId);
+
+  await user.activateUserByUserId(validActivationToken.user_id);
 
   return response.status(200).json(usedActivationToken);
 }

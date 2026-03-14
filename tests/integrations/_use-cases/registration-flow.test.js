@@ -1,5 +1,6 @@
 import webserver from "infra/webserver.js";
 import activation from "models/activation.js";
+import user from "models/user.js";
 import orchestrator from "tests/orchestrator.js";
 
 beforeAll(async () => {
@@ -52,7 +53,7 @@ describe("Use case: Registration Flow (all sucessful)", () => {
     expect(lastEmail.subject).toBe("Ative seu cadastro no TabInvest!");
     expect(lastEmail.text).toContain("RegistrationFlow");
 
-    const activationTokenId = orchestrator.extractUUID(lastEmail.text);
+    activationTokenId = orchestrator.extractUUID(lastEmail.text);
 
     expect(lastEmail.text).toContain(
       `${webserver.origin}/cadastro/ativar/${activationTokenId}`,
@@ -79,7 +80,7 @@ describe("Use case: Registration Flow (all sucessful)", () => {
 
     expect(Date.parse(activationResponseBody.used_at)).not.toBeNaN();
 
-    const activatedUser = await user.findOneByUsername("dnllira");
+    const activatedUser = await user.findOneByUsername("RegistrationFlow");
     expect(activatedUser.features).toEqual(["create:session"]);
   });
 
