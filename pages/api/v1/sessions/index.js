@@ -2,10 +2,12 @@ import { createRouter } from "next-connect";
 import controller from "infra/controller.js";
 import authentication from "models/authentication";
 import session from "models/session.js";
+import next from "next";
 
 const router = createRouter();
 
-router.post(postHandler);
+router.use(controller.injectAnonymousOrUser);
+router.post(controller.canRequest("create:session"), postHandler);
 router.delete(deleteHandler);
 
 export default router.handler(controller.errorHandlers);
